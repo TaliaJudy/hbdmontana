@@ -70,6 +70,7 @@
       user-select: none;
       position: relative;
       z-index: 1;
+      color: #8b2356;
     }
 
     h1 {
@@ -95,8 +96,10 @@
       padding: 30px;
       border-radius: 25px;
       box-shadow: 0 8px 30px rgba(255, 105, 180, 0.2);
-      color: #8b2356;
       line-height: 1.5;
+      min-height: 200px;
+      white-space: pre-wrap;
+      text-align: left;
     }
 
     #birthday-quote {
@@ -106,7 +109,8 @@
       max-width: 600px;
       margin: 30px auto 10px;
       text-shadow: 1px 1px 8px #ff69b4;
-      transition: opacity 0.5s ease;
+      min-height: 60px;
+      white-space: pre-wrap;
     }
 
     footer {
@@ -150,17 +154,12 @@
     <h1>🎉 Happy 19th Birthday, Montana! 🎉</h1>
     <h2>You're 19 and totally glowing 💖</h2>
 
-    <div class="message">
-      <p>Dear Montana,</p>
-      <p>You light up every room with your smile, and today the spotlight's all on you! 🌸</p>
-      <p>This year, may your dreams come true, your heart stay full, and your days be as lovely as you are.</p>
-      <p>Happy Birthday, beautiful! 🎂💐</p>
-    </div>
+    <div class="message" id="typed-message"></div>
 
     <p id="birthday-quote" aria-live="polite"></p>
 
     <footer>
-      Made with sparkle & love 💖 from cytra ❤️💗 — August 9, 2025
+      Made with sparkle & love 💖 — August 9, 2025
       <div class="credit">Crafted by the glam dev himself, <strong>Cytra</strong> 💅✨</div>
     </footer>
   </div>
@@ -168,7 +167,7 @@
   <!-- Background Music -->
   <audio id="bg-music" loop>
     <!-- Put your src below -->
-    <source src="https://github.com/TaliaJudy/rakhim/blob/main/Happy%20Birthday%20(Remix).m4a" type="audio/mpeg" />
+    <source src="Happy Birthday (Remix).m4a" type="audio/mpeg" />
     Your browser does not support the audio element.
   </audio>
 
@@ -181,6 +180,9 @@
     const mainContent = document.getElementById("main-content");
     const sparkleSound = document.getElementById("sparkle-sound");
     const bgMusic = document.getElementById("bg-music");
+    const typedMessageElem = document.getElementById("typed-message");
+    const quoteElem = document.getElementById("birthday-quote");
+
     const quotes = [
       "Sparkle like the birthday star you are! ✨🌟",
       "May your day be as fabulous as your smile! 💕",
@@ -214,9 +216,43 @@
       "Born to sparkle, destined to shine — happy 19th! 🎂✨"
     ];
 
+    const birthdayMessageLines = [
+      "Dear Montana,",
+      "You light up every room with your smile, and today the spotlight's all on you! 🌸",
+      "This year, may your dreams come true, your heart stay full, and your days be as lovely as you are.",
+      "Happy Birthday, beautiful codm queen..we love you🎂💐"
+    ];
+
+    // Typing effect helper function
+    function typeText(element, text, delay = 40) {
+      return new Promise((resolve) => {
+        let i = 0;
+        element.textContent = '';
+        const interval = setInterval(() => {
+          element.textContent += text.charAt(i);
+          i++;
+          if (i >= text.length) {
+            clearInterval(interval);
+            resolve();
+          }
+        }, delay);
+      });
+    }
+
+    async function typeMessage(lines) {
+      typedMessageElem.textContent = '';
+      for (let i = 0; i < lines.length; i++) {
+        await typeText(typedMessageElem, lines[i]);
+        if (i < lines.length - 1) {
+          typedMessageElem.textContent += "\n\n";
+          await new Promise(r => setTimeout(r, 600)); // pause between lines
+        }
+      }
+    }
+
     function startConfetti() {
-      const emojis = ['🎉', '✨', '🎈', '💖', '🌸'];
-      const confettiCount = 25;
+      const emojis = ['🎉', '✨', '🎈', '💖', '🌸','💗','🥰'];
+      const confettiCount = 30;
 
       for (let i = 0; i < confettiCount; i++) {
         const emoji = document.createElement("div");
@@ -234,28 +270,28 @@
       }
     }
 
-    giftBtn.addEventListener("click", () => {
-      // Play sounds
+    async function startBirthdaySequence() {
       sparkleSound.currentTime = 0;
       sparkleSound.play();
       bgMusic.play();
 
-      // Show main content and hide entry
       entry.style.display = "none";
       mainContent.style.display = "block";
       mainContent.setAttribute("aria-hidden", "false");
       giftBtn.setAttribute("aria-expanded", "true");
 
-      // Set random quote
+      await typeMessage(birthdayMessageLines);
+
+      // After message, show random quote typed out
       const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
-      const quoteElem = document.getElementById("birthday-quote");
-      quoteElem.textContent = randomQuote;
+      await typeText(quoteElem, randomQuote);
 
-      // Start confetti effect
       startConfetti();
-    });
+    }
 
-    // Accessibility: allow Enter key to trigger gift button
+    giftBtn.addEventListener("click", startBirthdaySequence);
+
+    // Accessibility: allow Enter or Space key to trigger gift button
     entry.addEventListener("keydown", (e) => {
       if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
